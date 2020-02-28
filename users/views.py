@@ -1,5 +1,6 @@
 from django.shortcuts import render,redirect,reverse
 from users.models import Passport, Address
+from util.decorators import login_required
 from util.get_hash import get_hash
 from django.http import JsonResponse, HttpResponseRedirect
 import re
@@ -47,26 +48,6 @@ def register(request):
     # 注册完，返回注册页
     return  redirect(reverse('books:index'))
 
-# 登录页面
-# def login(request):
-#     '''
-#     res：0 用户不存在
-#     res：1 校验通过，登录成功
-#     res：2 数据非法
-#     '''
-#     if request.method == "GET":
-#         if request.COOKIES.get('username'):
-#             username = request.COOKIES.get("username")
-#             checked = 'checked'
-#         else:
-#             username = ''
-#             checked = ''
-#         context = {
-#             'username' : username,
-#             'checked'  : checked,
-#         }
-#         return render(request,"users/login.html",context)
-
 def login(request):
     if request.method == 'GET':
         request.session['login_from'] = request.META.get('HTTP_REFERER', '/')
@@ -92,10 +73,13 @@ def login(request):
             return render(request,'users/login.html',{'errmsg':'用户名或密码为空'})
 
         # 根据用户名密码，查找账户信息
-        passport = Passport.objects.filter(username=username,password=password)
+        try:
+            passport = Passport.objects.get(username=username,password=password)
+        except Exception as e:
+            return JsonResponse({'res': '0'})
         if passport:
-            passport=passport[0]
             # 判断是否记住用户名
+            print(passport)
             res = HttpResponseRedirect(request.session['login_from'])
             if remember=='true':
                 res.set_cookie('username',username,max_age=7*24*3600)
@@ -118,7 +102,7 @@ def logout(request):
     request.session.flush()
     return redirect(reverse('books:index'))
 
-
+@login_required
 def user(request):
     '''用户中心-信息页'''
     passport_id = request.session.get('passport_id')
@@ -133,4 +117,5 @@ def user(request):
         'books_li':books_li,
     }
 
-    return render(request,'users/user_center/info.html',context)
+    return render(request,'users/user_center_info.html',context)
+

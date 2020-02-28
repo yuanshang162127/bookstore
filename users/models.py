@@ -31,13 +31,13 @@ class Passport(BaseModel):
     class Meta:
         db_table = 's_user_account'
 
-class AddressManager(models.Manager):
+class AddressManager(models.manager.Manager):
     '''地址模型类管理类'''
     def get_default_address(self,passport_id):
         '''查询指定账户的默认收获地址'''
         try:
             addr = self.get(passport_id=passport_id,is_default=True)
-        except self.models.DoesNotExist:
+        except Exception as e:
             # 没有默认收货地址
             addr = None
 
@@ -70,7 +70,7 @@ class Address(BaseModel):
     '''地址模型类'''
     recipient_name = models.CharField(max_length=20,verbose_name='收件人')
     recipient_addr = models.CharField(max_length=256,verbose_name='收件地址')
-    zip_code = models.IntegerField(max_length=6,verbose_name='邮政编码')
+    zip_code = models.IntegerField(verbose_name='邮政编码')
     recipient_phone = models.CharField(max_length=11,verbose_name='联系电话')
     is_default = models.BooleanField(default=False,verbose_name='是否默认')
     passport = models.ForeignKey('Passport',verbose_name='账户')

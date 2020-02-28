@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'users',  # 用户模块
     'books',  # 商品模块
     'tinymce', # 富文本编辑器
+    'cart',
 ]
 
 MIDDLEWARE = [
@@ -141,3 +142,5 @@ TINYMCE_DEFAULT_CONFIG = {
 }
 # 图片存放路径
 MEDIA_ROOT = os.path.join(BASE_DIR, "static")
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
