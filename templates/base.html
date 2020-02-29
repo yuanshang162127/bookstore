@@ -20,7 +20,7 @@
 {% block header_con %}
     <div class="header_con">
         <div class="header">
-            <div class="welcome fl">欢迎来到尚硅谷书店!</div>
+            <div class="welcome fl">书城</div>
             <div class="fr">
                 {% if request.session.islogin %}
                 <div class="login_btn fl">
@@ -64,17 +64,6 @@
 {# 网页主体内容块 #}
 {% block body %}{% endblock body %}
 
-    <div class="footer">
-        <div class="foot_link">
-            <a href="#">关于我们</a>
-            <span>|</span>
-            <a href="#">联系我们</a>
-            <span>|</span>
-            <a href="#">招聘人才</a>
-            <span>|</span>
-            <a href="#">友情链接</a>
-        </div>
-    </div>
     {# 网页底部html元素块 #}
     {% block bottom %}{% endblock bottom %}
     {# 网页底部引入文件块 #}

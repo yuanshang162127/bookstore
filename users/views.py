@@ -119,3 +119,33 @@ def user(request):
 
     return render(request,'users/user_center_info.html',context)
 
+
+@login_required
+def address(request):
+    passport_id = request.session.get('passport_id')
+
+    if request.method == 'GET':
+        # 显示地址页面
+        addr = Address.objects.get_default_address(passport_id=passport_id)
+        return render(request,'users/user_center_site.html',{'addr':addr,'page':'address'})
+
+    else:
+        # 添加收获地址
+        recipient_name = request.POST.get('username')
+        recipient_addr = request.POST.get('addr')
+        zip_code = request.POST.get('zip_code')
+        recipient_phone = request.POST.get('phone')
+
+        # 校验数据是否为空
+        if not all([recipient_name,recipient_addr,zip_code,recipient_phone]):
+            return render(request,'users/user_center_site.html',{'errmsg':'参数不能为空'})
+
+        Address.objects.add_one_address(passport_id=passport_id,
+                                        recipient_name=recipient_name,
+                                        recipient_addr=recipient_addr,
+                                        recipient_phone=recipient_phone,
+                                        zip_code=zip_code)
+
+        return redirect(reverse('users:address'))
+
+

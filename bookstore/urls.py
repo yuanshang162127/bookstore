@@ -22,6 +22,8 @@ urlpatterns = [
     url(r'^users/',include('users.urls',namespace='users')),
     url(r'^tinymce/', include('tinymce.urls')),
     url(r'^cart/',include('cart.urls',namespace='cart')),
+    url(r'^order/', include('order.urls', namespace='order')),
     url(r'^', include('books.urls', namespace='books')),
+
 
 ]

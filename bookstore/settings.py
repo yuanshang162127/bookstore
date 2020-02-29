@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'users',  # 用户模块
     'books',  # 商品模块
     'tinymce', # 富文本编辑器
-    'cart',
+    'cart', # 购物车模块
+    'order', # 订单模块
 ]
 
 MIDDLEWARE = [
