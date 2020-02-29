@@ -31,7 +31,7 @@ class Passport(BaseModel):
     class Meta:
         db_table = 's_user_account'
 
-class AddressManager(models.manager.Manager):
+class AddressManager(models.Manager):
     '''地址模型类管理类'''
     def get_default_address(self,passport_id):
         '''查询指定账户的默认收获地址'''

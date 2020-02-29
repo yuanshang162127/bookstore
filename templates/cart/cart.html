@@ -3,18 +3,19 @@
 {% block body %}
 
     <form method="post" action="/order/place/">
-    {% for book in books_li %}
+    {% csrf_token %}
+    {% for books in books_li %}
     <ul class="cart_list_td clearfix">
         {# 提交表单时，如果checkbox没有被选中，它的值不会被提交 #}
-        <li class="col01"><input type="checkbox" name="books_ids" value="{{ book.id }}" checked></li>
-        <li class="col02"><img src="{% static book.image %}"></li>
-        <li class="col03">{{ book.name }}<br><em>{{ book.price }}元/{{ book.unit }}</em></li>
-        <li class="col04">{{ book.unit }}</li>
-        <li class="col05">{{ book.price }}</li>
+        <li class="col01"><input type="checkbox" name="books_ids" value="{{ books.id }}" checked></li>
+        <li class="col02"><img src="{% static books.image %}"></li>
+        <li class="col03">{{ books.name }}<br><em>{{ books.price }}元/{{ books.unit }}</em></li>
+        <li class="col04">{{ books.unit }}</li>
+        <li class="col05">{{ books.price }}</li>
         <li class="col06">
             <div class="num_add">
                 <a href="javascript:;" class="add fl">+</a>
-                <input type="text" books_id="{{ book.id }}" class="num_show fl" value="{{ book.count }}">
+                <input type="text" books_id="{{ books.id }}" class="num_show fl" value="{{ books.count }}">
                 <a href="javascript:;" class="minus fl">-</a>
             </div>
         </li>
@@ -28,7 +29,7 @@
         <li class="col02">全选</li>
         <li class="col03">合计(不含运费)：<span>¥</span><em>{{ total_price }}</em><br>共计<b>{{ total_count }}</b>件商品</li>
         <li class="col04"><input type="submit" value="去结算"></li>
-        {% csrf_token %}
+
     </ul>
     </form>
 	

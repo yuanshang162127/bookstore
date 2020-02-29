@@ -1,8 +1,10 @@
+from django.core.paginator import Paginator
 from django.shortcuts import render,redirect,reverse
 from users.models import Passport, Address
 from util.decorators import login_required
 from util.get_hash import get_hash
 from django.http import JsonResponse, HttpResponseRedirect
+from order.models import OrderInfo,OrderBooks
 import re
 
 # Create your views here.
@@ -107,7 +109,10 @@ def user(request):
     '''用户中心-信息页'''
     passport_id = request.session.get('passport_id')
     # 获取用户的基本信息
-    addr = Address.objects.get_default_address(passport_id=passport_id)
+    try:
+        addr = Address.objects.get(passport_id=passport_id,is_default=True)
+    except Exception as e:
+        addr = Address.objects.filter(passport_id=passport_id)[0]
 
     books_li = []
 
@@ -123,10 +128,14 @@ def user(request):
 @login_required
 def address(request):
     passport_id = request.session.get('passport_id')
-
+    print(passport_id)
     if request.method == 'GET':
         # 显示地址页面
-        addr = Address.objects.get_default_address(passport_id=passport_id)
+        try:
+            addr = Address.objects.get(passport_id=passport_id,is_default=True)
+        except Exception as e:
+            addr = Address.objects.filter(passport_id=passport_id)[0]
+        print(addr)
         return render(request,'users/user_center_site.html',{'addr':addr,'page':'address'})
 
     else:
@@ -135,7 +144,7 @@ def address(request):
         recipient_addr = request.POST.get('addr')
         zip_code = request.POST.get('zip_code')
         recipient_phone = request.POST.get('phone')
-
+        print(recipient_phone,recipient_addr,recipient_name,zip_code)
         # 校验数据是否为空
         if not all([recipient_name,recipient_addr,zip_code,recipient_phone]):
             return render(request,'users/user_center_site.html',{'errmsg':'参数不能为空'})
@@ -147,5 +156,55 @@ def address(request):
                                         zip_code=zip_code)
 
         return redirect(reverse('users:address'))
+
+
+@login_required
+def order(requst,page):
+    '''订单页面显示'''
+    passport_id = requst.session.get('passport_id')
+    # 获取订单列表
+    order_li = OrderInfo.objects.filter(passport_id=passport_id)
+
+    for order in order_li:
+        # 获取订单id
+        order_id = order.order_id
+        # 根据订单id获取对应的订单商品对象
+        order_books_li = OrderBooks.objects.filter(order_id=order_id)
+        for order_books in order_books_li:
+            count = order_books.count
+            price = order_books.price
+            amount = int(count) * int(price)
+            order_books.amount = amount
+
+        order.order_books_li = order_books_li
+
+        paginator = Paginator(order_li,3)
+        num_pages = paginator.num_pages
+
+        if not page:
+            page = 1
+        elif page =='' or int(page) >num_pages:
+            page = 1
+        else:
+            page= int(page)
+
+        order_li = paginator.page(page)
+
+        if num_pages<5:
+            pages = range(1,num_pages + 1)
+        elif num_pages<3:
+            pages = range(1,6)
+        elif num_pages - page <= 2:
+            pages = range(num_pages - 4, num_pages + 1)
+        else:
+            pages = range(page - 2, page + 3)
+
+        context = {
+            'order_li':order_li,
+            'pages':pages,
+        }
+
+        return render(requst,'users/user_center_order.html',context)
+
 
 
